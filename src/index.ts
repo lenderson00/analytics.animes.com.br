@@ -1,4 +1,4 @@
-import { Hono } from "hono";
+import { Context, Hono } from "hono";
 import { cors } from "hono/cors";
 import { env } from "hono/adapter";
 import { zValidator } from "@hono/zod-validator";
@@ -48,9 +48,10 @@ const eventSchema = zValidator(
   })
 );
 
-app.post("/view", eventSchema, async (c) => {
+const handleEvent = async (c: Context) => {
   const { ELASTICSEARCH_URL, ELASTICSEARCH_EVENTS_API_KEY } =
     env<ENVIRONMENT>(c);
+  // @ts-ignore
   const { o, ts, r, en, ed } = c.req.valid("json");
 
   const elasticsearch = new ElasticsearchService({
@@ -92,7 +93,10 @@ app.post("/view", eventSchema, async (c) => {
     console.error("Elasticsearch error:", error);
     return c.json({ error: "Failed to index event" }, 500);
   }
-});
+};
+
+app.post("/view", eventSchema, handleEvent);
+app.post("/event", eventSchema, handleEvent);
 
 app.all("*", (c) => {
   return c.json(

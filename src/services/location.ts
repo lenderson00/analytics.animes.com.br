@@ -41,6 +41,26 @@ export class LocationParser {
       }
     }
 
-    return location;
+    const {
+      city,
+      country,
+      region,
+      continent,
+      latitude,
+      longitude,
+      timezone,
+      asOrganization,
+    } = location;
+
+    return {
+      city,
+      country,
+      region,
+      continent,
+      latitude,
+      longitude,
+      timezone,
+      asOrganization,
+    };
   }
 }
