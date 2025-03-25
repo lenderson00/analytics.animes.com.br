@@ -8,12 +8,17 @@ import { UAParser } from "@ua-parser-js/pro-personal";
 import { UAAgenteParser } from "./services/ua-agent";
 import { LocationParser } from "./services/location";
 import { QueryParams } from "./services/query-params";
+import { GeoLocation } from "./services/location";
 
 type ENVIRONMENT = {
   ELASTICSEARCH_URL: string;
   ELASTICSEARCH_EVENTS_API_KEY: string;
   APP_URL: string;
 };
+
+interface CFRequest extends Request {
+  cf: GeoLocation;
+}
 
 const app = new Hono<{ Bindings: ENVIRONMENT }>();
 
@@ -52,8 +57,7 @@ app.post("/view", eventSchema, async (c) => {
   const utmParams = queryParamsParser.getUtmParams();
 
   const ip = c.req.header("CF-Connecting-IP");
-  // @ts-ignore
-  const cf = c.req.cf as GeoLocation;
+  const cf = (c.req.raw as CFRequest).cf;
 
   const locationParser = new LocationParser(cf);
 
@@ -62,7 +66,7 @@ app.post("/view", eventSchema, async (c) => {
       origin: o,
       timestamp: new Date(ts),
       referrer: r,
-      eventName: en ?? "",
+      eventName: en ?? "page_view",
       eventData: ed ?? {},
       ...uaAgentParser.getAllUserAgentInfo(),
       ...locationParser.getLocation(),

@@ -6,23 +6,32 @@ export type GeoLocation = {
   latitude?: number;
   longitude?: number;
   timezone?: string;
+  asOrganization?: string;
 };
 
 export class LocationParser {
   private cf: GeoLocation;
 
-  constructor(cf: GeoLocation) {
-    if (!cf) {
-      throw new Error("Cloudflare object is required");
-    }
-
-    this.cf = cf;
+  constructor(cf?: GeoLocation) {
+    this.cf = cf || {};
   }
 
-  getLocation() {
-    const location: GeoLocation = {};
+  getLocation(): GeoLocation {
+    if (!this.cf || Object.keys(this.cf).length === 0) {
+      return {};
+    }
 
-    const keys = Object.keys(this.cf) as (keyof GeoLocation)[];
+    const location: GeoLocation = {};
+    const keys = [
+      "city",
+      "country",
+      "region",
+      "continent",
+      "latitude",
+      "longitude",
+      "timezone",
+      "asOrganization",
+    ] as const;
 
     for (const key of keys) {
       const value = this.cf[key];
