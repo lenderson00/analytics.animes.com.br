@@ -6,6 +6,9 @@
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
 	},
 	"dependencies": {
+		"@elastic/elasticsearch": "^8.17.1",
+		"@hono/zod-validator": "^0.4.3",
+		"@ua-parser-js/pro-personal": "^2.0.3",
 		"hono": "^4.7.5"
 	},
 	"devDependencies": {
