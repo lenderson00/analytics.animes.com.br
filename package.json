@@ -1,18 +1,26 @@
 {
-	"name": "analytics",
-	"scripts": {
-		"dev": "wrangler dev",
-		"deploy": "wrangler deploy --minify",
-		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
-	},
-	"dependencies": {
-		"@elastic/elasticsearch": "^8.17.1",
-		"@hono/zod-validator": "^0.4.3",
-		"@ua-parser-js/pro-personal": "^2.0.3",
-		"hono": "^4.7.5"
-	},
-	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20250321.0",
-		"wrangler": "^4.4.0"
-	}
+  "name": "analytics",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "deploy:script": "npm run build && tsx script/deploy.ts",
+    "build": "tsx script/build.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.17.1",
+    "@hono/zod-validator": "^0.4.3",
+    "@ua-parser-js/pro-personal": "^2.0.3",
+    "dotenv": "^16.4.7",
+    "hono": "^4.7.5"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250321.0",
+    "wrangler": "^4.4.0",
+    "@types/node": "^20.11.0",
+    "esbuild": "^0.19.11",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
 }

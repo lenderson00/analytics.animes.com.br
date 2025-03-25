@@ -55,17 +55,7 @@ export class ElasticsearchService {
     });
   }
 
-  async searchEvents(query: {
-    from?: number;
-    size?: number;
-    sort?: Array<{ [key: string]: "asc" | "desc" }>;
-    query?: {
-      bool?: {
-        must?: Array<{ [key: string]: any }>;
-        filter?: Array<{ [key: string]: any }>;
-      };
-    };
-  }) {
+  async searchEvents(query: any) {
     return this.fetchWithAuth("/events/_search", {
       method: "POST",
       body: JSON.stringify(query),

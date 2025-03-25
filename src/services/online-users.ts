@@ -7,18 +7,16 @@ interface OnlineUsersConfig {
 }
 
 interface ElasticsearchResponse {
-  hits: {
-    hits: Array<{
-      _source: {
-        ip?: string;
-      };
-    }>;
+  aggregations?: {
+    unique_ips?: {
+      value: number;
+    };
   };
 }
 
 export class OnlineUsersService {
   private elasticsearch: ElasticsearchService;
-  private readonly ONLINE_THRESHOLD = 5 * 60 * 1000; // 5 minutes in milliseconds
+  private readonly ONLINE_THRESHOLD = 1 * 60 * 1000; // 1 minute in milliseconds
 
   constructor(config: OnlineUsersConfig) {
     this.elasticsearch = new ElasticsearchService({
@@ -30,7 +28,14 @@ export class OnlineUsersService {
   async getOnlineUsers() {
     const now = Date.now();
     const query = {
-      size: 10000,
+      size: 0,
+      aggs: {
+        unique_ips: {
+          cardinality: {
+            field: "ip",
+          },
+        },
+      },
       query: {
         bool: {
           must: [
@@ -49,15 +54,9 @@ export class OnlineUsersService {
     const result = (await this.elasticsearch.searchEvents(
       query
     )) as ElasticsearchResponse;
-    const hits = result.hits?.hits || [];
-    const onlineIPs = hits.map((hit) => hit._source.ip).filter(Boolean);
-
-    // Remove duplicate IPs
-    const uniqueIPs = [...new Set(onlineIPs)];
 
     return {
-      usersOnline: uniqueIPs.length,
-      users: uniqueIPs,
+      usersOnline: result.aggregations?.unique_ips?.value || 0,
     };
   }
 }
