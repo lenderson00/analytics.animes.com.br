@@ -7,6 +7,7 @@ import { ElasticsearchService } from "./services/elasticsearch";
 import { UAParser } from "@ua-parser-js/pro-personal";
 import { UAAgenteParser } from "./services/ua-agent";
 import { LocationParser } from "./services/location";
+import { QueryParams } from "./services/query-params";
 
 type ENVIRONMENT = {
   ELASTICSEARCH_URL: string;
@@ -45,13 +46,14 @@ app.post("/view", eventSchema, async (c) => {
   const uaParser = new UAParser(c.req.header("User-Agent"));
   const uaAgentParser = new UAAgenteParser(uaParser);
 
+  const queryParamsParser = new QueryParams(o);
+
+  const queryParams = queryParamsParser.getQueryParams();
+  const utmParams = queryParamsParser.getUtmParams();
+
+  const ip = c.req.header("CF-Connecting-IP");
   // @ts-ignore
-  const cf = c.req.cf as {
-    city?: string;
-    country?: string;
-    region?: string;
-    timezone?: string;
-  };
+  const cf = c.req.cf as GeoLocation;
 
   const locationParser = new LocationParser(cf);
 
@@ -59,11 +61,14 @@ app.post("/view", eventSchema, async (c) => {
     const eventData = {
       origin: o,
       timestamp: new Date(ts),
-      requestId: r,
+      referrer: r,
       eventName: en ?? "",
       eventData: ed ?? {},
       ...uaAgentParser.getAllUserAgentInfo(),
       ...locationParser.getLocation(),
+      queryParams,
+      utmParams,
+      ip,
     };
 
     await elasticsearch.indexEvent(eventData);

@@ -1,17 +1,17 @@
-export class LocationParser {
-  private cf: {
-    city?: string;
-    country?: string;
-    region?: string;
-    timezone?: string;
-  };
+export type GeoLocation = {
+  city?: string;
+  country?: string;
+  region?: string;
+  continent?: string;
+  latitude?: number;
+  longitude?: number;
+  timezone?: string;
+};
 
-  constructor(cf: {
-    city?: string;
-    country?: string;
-    region?: string;
-    timezone?: string;
-  }) {
+export class LocationParser {
+  private cf: GeoLocation;
+
+  constructor(cf: GeoLocation) {
     if (!cf) {
       throw new Error("Cloudflare object is required");
     }
@@ -20,22 +20,16 @@ export class LocationParser {
   }
 
   getLocation() {
-    const location: Record<string, string> = {};
+    const location: GeoLocation = {};
 
-    if (this.cf.city) {
-      location.city = this.cf.city;
-    }
+    const keys = Object.keys(this.cf) as (keyof GeoLocation)[];
 
-    if (this.cf.country) {
-      location.country = this.cf.country;
-    }
-
-    if (this.cf.region) {
-      location.region = this.cf.region;
-    }
-
-    if (this.cf.timezone) {
-      location.timezone = this.cf.timezone;
+    for (const key of keys) {
+      const value = this.cf[key];
+      if (value !== undefined && value !== null) {
+        // @ts-ignore
+        location[key] = value;
+      }
     }
 
     return location;

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GeoLocation } from "./location";
 
 export interface ElasticsearchConfig {
   url: string;
@@ -8,9 +9,13 @@ export interface ElasticsearchConfig {
 export interface EventData {
   origin: string;
   timestamp: Date;
-  requestId: string;
+  referrer: string;
   eventName: string;
   eventData: unknown;
+  queryParams: Record<string, string>;
+  utmParams: Record<string, string>;
+  location?: GeoLocation;
+  ip?: string;
 }
 
 export class ElasticsearchService {
