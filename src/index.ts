@@ -22,7 +22,17 @@ interface CFRequest extends Request {
 
 const app = new Hono<{ Bindings: ENVIRONMENT }>();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, c) => {
+      if (!origin) return null;
+      return origin === "http://localhost:3000" ||
+        origin.endsWith("animes.com.br")
+        ? origin
+        : null;
+    },
+  })
+);
 
 const eventSchema = zValidator(
   "json",
