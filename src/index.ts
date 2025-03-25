@@ -9,10 +9,12 @@ import { UAAgenteParser } from "./services/ua-agent";
 import { LocationParser } from "./services/location";
 import { QueryParams } from "./services/query-params";
 import { GeoLocation } from "./services/location";
+import users from "./routes/users";
 
 type ENVIRONMENT = {
   ELASTICSEARCH_URL: string;
   ELASTICSEARCH_EVENTS_API_KEY: string;
+  ELASTICSEARCH_INDEX_ONLINE_USERS: string;
   APP_URL: string;
 };
 
@@ -97,6 +99,8 @@ const handleEvent = async (c: Context) => {
 
 app.post("/view", eventSchema, handleEvent);
 app.post("/event", eventSchema, handleEvent);
+
+app.route("/users", users);
 
 app.all("*", (c) => {
   return c.json(
